@@ -36,6 +36,7 @@ func main() {
 func InitRouter() {
 	router = make(map[string]func(*tgbotapi.Message, *tgbotapi.MessageConfig))
 	router["/oss"] = processors.UploadToOSS
+	router["/whoami"] = processors.WhoAmI
 }
 
 func Router(rcvd tgbotapi.Message) tgbotapi.MessageConfig {
