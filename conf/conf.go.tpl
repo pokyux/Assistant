@@ -1,5 +1,7 @@
 package conf
 
+const TGBotToken = ""
+
 const SuperAdmin = 5637757591
 
 var NormalUsers = []int64{5637757591}

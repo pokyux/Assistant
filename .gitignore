@@ -3,4 +3,4 @@
 .vscode
 .idea
 
-conf
+conf/conf.go
