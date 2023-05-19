@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/pokyux/Assistant/conf"
@@ -37,15 +36,20 @@ func main() {
 
 func InitRouter() {
 	router = make(map[string]func(*tgbotapi.Message, *tgbotapi.MessageConfig))
-	router["/oss"] = processors.UploadToOSS
-	router["/whoami"] = processors.WhoAmI
+	router["oss"] = processors.UploadToOSS
+	router["whoami"] = processors.WhoAmI
 }
 
 func Router(rcvd tgbotapi.Message) tgbotapi.MessageConfig {
 	rply := tgbotapi.NewMessage(rcvd.Chat.ID, "")
 	rply.ReplyToMessageID = rcvd.MessageID
 
-	processor := router[strings.Split(rcvd.Text, " ")[0]]
+	processor := router[rcvd.Command()]
+
+	if rcvd.Document != nil {
+		processor = processors.UploadToOSS
+	}
+
 	if processor == nil {
 		processor = processors.NotFound
 	}
