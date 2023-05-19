@@ -26,6 +26,11 @@ func InitOSS() {
 }
 
 func UploadToOSS(rcvd *tgbotapi.Message, rply *tgbotapi.MessageConfig) {
+	if !IsNormalUser(rcvd.From.ID) {
+		rply.Text = "Permission denied."
+		return
+	}
+
 	if rcvd.Document == nil {
 		rply.Text = "No document. Failed."
 		return
