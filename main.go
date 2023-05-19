@@ -2,20 +2,20 @@ package main
 
 import (
 	"log"
-	"os"
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/pokyux/Assistant/conf"
 	"github.com/pokyux/Assistant/processors"
 )
 
 var router map[string]func(*tgbotapi.Message, *tgbotapi.MessageConfig)
 
 func main() {
+	processors.InitOSS()
 	InitRouter()
 
-	token := os.Args[1]
-	bot, err := tgbotapi.NewBotAPI(token)
+	bot, err := tgbotapi.NewBotAPI(conf.TGBotToken)
 	if err != nil {
 		panic(err)
 	}

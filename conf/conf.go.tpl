@@ -12,4 +12,5 @@ const (
 	OSSAccessKeyId     = ""
 	OSSAccessKeySecret = ""
 	OSSBucketName      = ""
+  OSSDomain          = ""
 )
