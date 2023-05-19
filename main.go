@@ -3,8 +3,10 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/pokyux/Assistant/processors"
 )
 
 func main() {
@@ -23,10 +25,21 @@ func main() {
 			continue
 		}
 		log.Printf("Msg from: %s.\n", update.Message.From.UserName)
-
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "rcvd")
-		msg.ReplyToMessageID = update.Message.MessageID
-
-		bot.Send(msg)
+		bot.Send(Router(*update.Message))
 	}
+}
+
+func Router(rcvd tgbotapi.Message) tgbotapi.MessageConfig {
+	rply := tgbotapi.NewMessage(rcvd.Chat.ID, "")
+	rply.ReplyToMessageID = rcvd.MessageID
+
+	command := strings.Split(rcvd.Text, " ")[0]
+	switch command {
+	case "/oss":
+		processors.UploadToOSS(&rcvd, &rply)
+	default:
+		processors.NotFound(&rcvd, &rply)
+	}
+
+	return rply
 }
