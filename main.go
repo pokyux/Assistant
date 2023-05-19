@@ -9,7 +9,11 @@ import (
 	"github.com/pokyux/Assistant/processors"
 )
 
+var router map[string]func(*tgbotapi.Message, *tgbotapi.MessageConfig)
+
 func main() {
+	InitRouter()
+
 	token := os.Args[1]
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
@@ -29,17 +33,20 @@ func main() {
 	}
 }
 
+func InitRouter() {
+	router = make(map[string]func(*tgbotapi.Message, *tgbotapi.MessageConfig))
+	router["/oss"] = processors.UploadToOSS
+}
+
 func Router(rcvd tgbotapi.Message) tgbotapi.MessageConfig {
 	rply := tgbotapi.NewMessage(rcvd.Chat.ID, "")
 	rply.ReplyToMessageID = rcvd.MessageID
 
-	command := strings.Split(rcvd.Text, " ")[0]
-	switch command {
-	case "/oss":
-		processors.UploadToOSS(&rcvd, &rply)
-	default:
-		processors.NotFound(&rcvd, &rply)
+	processor := router[strings.Split(rcvd.Text, " ")[0]]
+	if processor == nil {
+		processor = processors.NotFound
 	}
 
+	processor(&rcvd, &rply)
 	return rply
 }
