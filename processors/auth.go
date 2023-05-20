@@ -2,6 +2,8 @@ package processors
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/pokyux/Assistant/conf"
@@ -24,4 +26,26 @@ func WhoAmI(rcvd *tgbotapi.Message, rply *tgbotapi.MessageConfig) {
 	} else {
 		rply.Text += "are not my admin."
 	}
+}
+
+func AddNormalUser(rcvd *tgbotapi.Message, rply *tgbotapi.MessageConfig) {
+	if rcvd.From.ID != conf.SuperAdmin {
+		rply.Text = "Permission denied."
+		return
+	}
+
+	textSplt := strings.Split(rcvd.Text, " ")
+	if len(textSplt) != 2 {
+		rply.Text = "Syntax error."
+		return
+	}
+
+	id, err := strconv.ParseInt(textSplt[1], 10, 64)
+	if err != nil {
+		rply.Text = "Syntax error."
+		return
+	}
+
+	conf.NormalUsers = append(conf.NormalUsers, id)
+	rply.Text = fmt.Sprintf("User added. ID: %d.", id)
 }

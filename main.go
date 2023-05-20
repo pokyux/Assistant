@@ -38,6 +38,8 @@ func InitRouter() {
 	router = make(map[string]func(*tgbotapi.Message, *tgbotapi.MessageConfig))
 	router["oss"] = processors.UploadToOSS
 	router["whoami"] = processors.WhoAmI
+	router["addnormaluser"] = processors.AddNormalUser
+	router["repeat"] = processors.Repeat
 }
 
 func Router(rcvd tgbotapi.Message) tgbotapi.MessageConfig {
