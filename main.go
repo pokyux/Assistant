@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/pokyux/Assistant/conf"
@@ -46,6 +48,10 @@ func Router(rcvd tgbotapi.Message) tgbotapi.MessageConfig {
 	rply := tgbotapi.NewMessage(rcvd.Chat.ID, "")
 	rply.ReplyToMessageID = rcvd.MessageID
 
+	if global.Debug {
+		fmt.Printf("uid: %d, Msg: %s\n", rcvd.From.ID, rcvd.Text)
+	}
+
 	processor := router[rcvd.Command()]
 
 	if rcvd.Document != nil {
@@ -58,4 +64,15 @@ func Router(rcvd tgbotapi.Message) tgbotapi.MessageConfig {
 
 	processor(&rcvd, &rply)
 	return rply
+}
+
+func InitFlags() {
+	global.Debug = false
+
+	for _, flag := range os.Args {
+		switch flag {
+		case "--debug":
+			global.Debug = true
+		}
+	}
 }
