@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -14,6 +13,7 @@ import (
 var router map[string]func(*tgbotapi.Message, *tgbotapi.MessageConfig)
 
 func main() {
+	InitFlags()
 	processors.InitOSS()
 	InitRouter()
 
@@ -31,7 +31,9 @@ func main() {
 		if update.Message == nil {
 			continue
 		}
-		log.Printf("Msg from: %s.\n", update.Message.From.UserName)
+		if global.Debug {
+			log.Printf("uid: %d, Msg: %s\n", update.Message.From.ID, update.Message.Text)
+		}
 		global.Bot.Send(Router(*update.Message))
 	}
 }
@@ -47,10 +49,6 @@ func InitRouter() {
 func Router(rcvd tgbotapi.Message) tgbotapi.MessageConfig {
 	rply := tgbotapi.NewMessage(rcvd.Chat.ID, "")
 	rply.ReplyToMessageID = rcvd.MessageID
-
-	if global.Debug {
-		fmt.Printf("uid: %d, Msg: %s\n", rcvd.From.ID, rcvd.Text)
-	}
 
 	processor := router[rcvd.Command()]
 
@@ -72,6 +70,7 @@ func InitFlags() {
 	for _, flag := range os.Args {
 		switch flag {
 		case "--debug":
+			log.Println("Debug mode: on")
 			global.Debug = true
 		}
 	}
